@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Arquivos</title>
+</head>
+<body>
+    <strong style="display: content; color: blue; height: max-content;"> Faça Upload de Arquivos</strong>
+
+    <form 
+    style="display: flex;
+    flex-direction: column;
+    background-color: antiquewhite;"
+    action="/upload" 
+    method="post" 
+    enctype="multipart/form-data"
+    >
+        <input 
+        style="padding: 1cm;
+        "
+        type="file" 
+        name="arquivo">
+        <button 
+        style="padding: 1cm;"
+        type="submit">Enviar</button>
+    </form>
+</body>
+</html>
