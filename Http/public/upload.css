@@ -1,0 +1,33 @@
+body {
+    width: 100vh;
+
+    box-sizing: border-box;
+    margin: auto;
+    padding: auto;
+    justify-content: center;
+}
+
+.main-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.main-form strong {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.6;
+    color: blue;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+}
+
+button {
+    cursor: pointer;
+}
+
