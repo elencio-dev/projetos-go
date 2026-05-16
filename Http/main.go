@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -20,8 +21,24 @@ func validarTipo(contentType string) bool {
 	return existe && permitido
 }
 
-func HandlerUpload(w http.ResponseWriter, r *http.Request) {
+func HandlerUploadFiles(w http.ResponseWriter, r *http.Request) {
+	entries, err := os.ReadDir("./uploads")
+	if err != nil {
+		http.Error(w, "Error ao carregar arquivos", http.StatusInternalServerError)
+		return
+	}
 
+	nome := []string{}
+
+	for _, entry := range entries {
+		nome = append(nome, entry.Name())
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(nome)
+}
+
+func HandlerUpload(w http.ResponseWriter, r *http.Request) {
 	//primeiro verificamos o metodo usado
 	if r.Method != http.MethodPost {
 		http.Error(w, "Metodo não permitido", http.StatusMethodNotAllowed)
@@ -76,7 +93,7 @@ func HandlerUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Arquivo %s enviado com sucesso", header.Filename)
+	fmt.Fprintf(w, "Arquivo %s enviado com sucesso", name)
 
 }
 
@@ -112,7 +129,9 @@ func main() {
 
 	//rotas
 	mux.Handle("/", fs)
+	//rotas protegidas
 	mux.HandleFunc("/upload", basicAuth(HandlerUpload, usuarios))
+	mux.HandleFunc("/arquivos", basicAuth(HandlerUploadFiles, usuarios))
 
 	log.Println("Servindo" + dir + "em http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
