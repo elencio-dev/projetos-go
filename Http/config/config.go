@@ -2,12 +2,18 @@ package config
 
 import "log/slog"
 
+type Usuario struct {
+	Usuario string
+	Email   string
+	Senha   string
+}
+
 type Config struct {
 	Port          string
 	UploadDir     string
 	PublicDir     string
 	MaxUploadSize int64
-	Usuarios      map[string]string
+	Usuarios      map[string]Usuario
 	Logger        *slog.Logger
 }
 
@@ -17,9 +23,12 @@ func New() *Config {
 		UploadDir:     "./uploads",
 		PublicDir:     "./public",
 		MaxUploadSize: 10 << 20, //10MB
-		Usuarios: map[string]string{
-			"admin": "123456",
-			"user":  "senha",
+		Usuarios: map[string]Usuario{
+			"admin": {
+				Usuario: "Administrador",
+				Email:   "admin@gmail.com",
+				Senha:   "12345Type",
+			},
 		},
 		Logger: NewLogger(),
 	}

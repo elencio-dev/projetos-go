@@ -14,6 +14,7 @@ func main() {
 	ctg := config.New()
 	uploadHandler := &handlers.UploadHandler{Config: ctg}
 	filesHandler := &handlers.FilesHandler{Config: ctg}
+	loginHandler := handlers.LoginHandler{Config: ctg}
 	os.MkdirAll(ctg.UploadDir, 0755)
 
 	rl := middleware.NewRateLimiter(5)
@@ -25,10 +26,11 @@ func main() {
 	//rotas
 	mux.Handle("/", fs)
 	//rotas protegidas
-	mux.HandleFunc("/upload", middleware.BasicAuth(
-		middleware.RateLimit(rl, uploadHandler.ServeUpload), ctg.Usuarios,
+	mux.HandleFunc("/upload", middleware.JwtAuth(
+		middleware.RateLimit(rl, uploadHandler.ServeUpload),
 	))
-	mux.HandleFunc("/arquivos", middleware.BasicAuth(filesHandler.HandlerUploadFiles, ctg.Usuarios))
+	mux.HandleFunc("/arquivos", middleware.JwtAuth(filesHandler.HandlerUploadFiles))
+	mux.HandleFunc("/login", loginHandler.ServeLogin)
 
 	log.Println("Servindo" + ctg.PublicDir + " em http://localhost:8080")
 	log.Fatal(http.ListenAndServe(ctg.Port, mux))
