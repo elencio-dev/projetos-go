@@ -1,11 +1,14 @@
 package config
 
+import "log/slog"
+
 type Config struct {
 	Port          string
 	UploadDir     string
 	PublicDir     string
 	MaxUploadSize int64
 	Usuarios      map[string]string
+	Logger        *slog.Logger
 }
 
 func New() *Config {
@@ -18,5 +21,6 @@ func New() *Config {
 			"admin": "123456",
 			"user":  "senha",
 		},
+		Logger: NewLogger(),
 	}
 }

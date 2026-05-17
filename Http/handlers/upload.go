@@ -17,11 +17,13 @@ type UploadHandler struct {
 func (h *UploadHandler) ServeUpload(w http.ResponseWriter, r *http.Request) {
 	//primeiro verificamos o metodo usado
 	if r.Method != http.MethodPost {
+		h.Config.Logger.Warn("Metodo Inválido",
+			"method", r.Method)
 		http.Error(w, "Metodo não permitido", http.StatusMethodNotAllowed)
 		return
 	}
 
-	r.Body = http.MaxBytesReader(w, r.Body, h.Config.MaxUploadSize) //limitar o tamnho do upload do arquivo
+	r.Body = http.MaxBytesReader(w, r.Body, h.Config.MaxUploadSize) //limitar o tamanho do upload do arquivo
 	err := r.ParseMultipartForm(h.Config.MaxUploadSize)
 
 	if err != nil {
@@ -48,6 +50,8 @@ func (h *UploadHandler) ServeUpload(w http.ResponseWriter, r *http.Request) {
 	contentType := http.DetectContentType(buffer)
 
 	if !validarTipo(contentType) {
+		h.Config.Logger.Warn("Tipo de Arquivo Rejeitado",
+			"tipo", contentType)
 		http.Error(w, "Tipo de arquivo não Permitido"+contentType, http.StatusBadRequest)
 		return
 	}
@@ -65,9 +69,16 @@ func (h *UploadHandler) ServeUpload(w http.ResponseWriter, r *http.Request) {
 	defer dst.Close()
 
 	if _, err := io.Copy(dst, file); err != nil {
+		h.Config.Logger.Warn("Erro ao copiar arquivo",
+			"erro", err)
 		http.Error(w, "Erro ao copiar os dados: ", http.StatusInternalServerError)
 		return
 	}
+
+	h.Config.Logger.Info("Upload realizado com sucesso",
+		"arquivo", name,
+		"tamanho", header.Size,
+	)
 
 	fmt.Fprintf(w, "Arquivo %s enviado com sucesso", name)
 
