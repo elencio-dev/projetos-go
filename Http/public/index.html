@@ -1,12 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprendendo Go</title>
+    <title>Upload de Arquivos</title>
     <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
-    <span>Primeiro Código Http em Go</span>
+    <div id="login-section">
+        <h2>Login</h2>
+        <input type="text" id="usuario" placeholder="Usuario">
+        <input type="password" id="senha" placeholder="Senha">
+        <button onclick="Login()">Enviar</button>
+    </div>
+
+    <div id="upload-section">
+        <h2>Upload de Arquivos</h2>
+        <p>Logado como: <strong id="usuario-logado"></strong></p>
+        <input type="file" id="arquivo">
+        <button onclick="Upload()">Enviar</button>
+        <button onclick="Logout()" style="background: #dc3545;">Sair</button>
+    </div>
+
+    <div id="mensagem"></div>
+
+
+    <script>
+        window.onload = () => {
+            const token = localStorage.getItem("token")
+            const usuario = localStorage.getItem("usuario")
+            if (token) mostrarUpload(usuario)
+        }
+
+        async function Login() {
+            const usuario = document.getElementById("usuario").value
+            const senha = document.getElementById("senha").value
+
+            resp = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ usuario, senha })
+            })
+            console.log("O aconteceu!",resp)
+
+            if (!resp.ok) {
+                mostrarMensagem("Credencias Invalidas", "erro")
+                return
+            }
+
+            const data = await resp.json()
+
+            localStorage.setItem("token", data.token)
+            localStorage.setItem("usuario", usuario)
+
+            mostrarUpload(usuario)
+        }
+
+        async function Upload(){
+            const arquivo = document.getElementById("arquivo").files[0]
+            if (!arquivo) {
+                mostrarMensagem("Selecione um arquivo", "erro")
+                return
+            }
+
+            const token = localStorage.getItem("token")
+            const formData = new FormData()
+
+            formData.append("arquivo", arquivo)
+
+            const resp = await fetch("/upload", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                body: formData
+            })
+
+            const texto = await resp.text()
+
+            if (resp.ok) {
+                mostrarMensagem("Sucesso", texto)
+            } else {
+                mostrarMensagem(texto, "erro")
+            }
+        }
+
+        function Logout(){
+            localStorage.removeItem("token")
+            localStorage.removeItem("usuario")
+
+            document.getElementById("login-section").style.display = "block"
+            document.getElementById("upload-section").style.display = "none"
+        }
+
+        function mostrarUpload(usuario) {
+            document.getElementById("login-section").style.display = "none"
+            document.getElementById("upload-section").style.display = "block"
+
+            document.getElementById("usuario-logado").textContent = usuario
+        }
+
+        function mostrarMensagem(texto, tipo) {
+           const el = document.getElementById("mensagem")
+
+           el.textContent = texto
+           el.className = tipo
+        }
+    </script>
 </body>
+
 </html>

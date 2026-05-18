@@ -1,5 +1,44 @@
-span {
-    font-size: 30px;
-    color: blue;
-    text-decoration: underline; 
+body {
+    max-width: 500px;
+    font-family: Arial, sans-serif;
+    margin: 50px auto;
+}
+
+input, button {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+button {
+    background: #007bff;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#messagem {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.sucesso {
+    background: #d4edda;
+    color: #155724;
+}
+
+.erro {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+
+#upload-section {
+    display: none;
 }
