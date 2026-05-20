@@ -22,7 +22,7 @@ type RegisterResponse struct {
 	Token string `json:"token"`
 }
 
-func (h *RegisterHandler) ServeLogin(w http.ResponseWriter, r *http.Request) {
+func (h *RegisterHandler) ServeRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Metodo não permitido", http.StatusMethodNotAllowed)
 		return
