@@ -1,6 +1,12 @@
 package config
 
-import "log/slog"
+import (
+	"log"
+	"log/slog"
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type Usuario struct {
 	Usuario string
@@ -15,9 +21,17 @@ type Config struct {
 	MaxUploadSize int64
 	Usuarios      map[string]Usuario
 	Logger        *slog.Logger
+	MongoURI      string
+	MongoDB       string
 }
 
 func New() *Config {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Erro ao carregar .env")
+	}
+
 	return &Config{
 		Port:          ":8080",
 		UploadDir:     "./uploads",
@@ -30,6 +44,8 @@ func New() *Config {
 				Senha:   "12345Type",
 			},
 		},
-		Logger: NewLogger(),
+		MongoURI: os.Getenv("MONGO_URI"),
+		MongoDB:  os.Getenv("MONGO_DB"),
+		Logger:   NewLogger(),
 	}
 }

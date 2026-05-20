@@ -2,34 +2,33 @@ package handlers
 
 import (
 	"encoding/json"
-	"fileupload/auth"
 	"fileupload/config"
 	"fileupload/store"
 	"net/http"
 )
 
-type LoginHandler struct {
+type RegisterHandler struct {
 	Config    *config.Config
 	UserStore *store.UserStore
 }
 
-type LoginRequest struct {
+type RegisterRequest struct {
 	Usuario string `json:"usuario"`
 	Email   string `json:"email"`
 	Senha   string `json:"senha"`
 }
 
-type LoginResponse struct {
+type RegisterResponse struct {
 	Token string `json:"token"`
 }
 
-func (h *LoginHandler) ServeLogin(w http.ResponseWriter, r *http.Request) {
+func (h *RegisterHandler) ServeLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Metodo não permitido", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var req LoginRequest
+	var req RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 
@@ -38,19 +37,16 @@ func (h *LoginHandler) ServeLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuario, err := h.UserStore.ValidarSenha(req.Usuario, req.Senha)
+	err = h.UserStore.CriarUsuario(req.Usuario, req.Email, req.Senha)
 	if err != nil {
-		http.Error(w, "Credencias Invalidas", http.StatusUnauthorized)
-		return
-	}
-
-	token, err := auth.GerarToken(usuario.Usuario)
-	if err != nil {
-		http.Error(w, "Erro ao gerar Token", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(LoginResponse{Token: token})
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]string{
+		"mensagem": "Usuario Criado com Sucesso!",
+	})
 
 }
